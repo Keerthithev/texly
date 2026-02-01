@@ -1,0 +1,8 @@
+{
+  "devDependencies": {
+    "autoprefixer": "^10.4.23"
+  },
+  "dependencies": {
+    "express": "^5.2.1"
+  }
+}

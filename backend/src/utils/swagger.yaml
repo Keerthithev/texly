@@ -1,0 +1,28 @@
+openapi: 3.0.0
+info:
+  title: Texly SMS SaaS API
+  version: 1.0.0
+  description: API documentation for Texly SMS SaaS platform
+servers:
+  - url: http://localhost:5000/api
+paths:
+  /auth/login:
+    post:
+      summary: User login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+      responses:
+        '200':
+          description: Login successful
+        '401':
+          description: Invalid credentials
+  # ... (Add all endpoints here for full documentation)
