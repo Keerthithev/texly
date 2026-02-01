@@ -1,8 +1,30 @@
 import api from './api';
 
-export const login = async (email, password) => {
-  const res = await api.post('/api/auth/login', { email, password });
-  localStorage.setItem('token', res.data.token);
+export const login = async (email, password, otp = null) => {
+  const res = await api.post('/api/auth/login', { email, password, otp });
+  if (res.data.token) {
+    localStorage.setItem('token', res.data.token);
+  }
+  return res.data;
+};
+
+export const signupPartial = async (name, email) => {
+  const res = await api.post('/api/auth/signup-partial', { name, email });
+  return res.data;
+};
+
+export const verifyInitialOtp = async (email, otp) => {
+  const res = await api.post('/api/auth/verify-initial-otp', { email, otp });
+  return res.data;
+};
+
+export const completeRegistration = async (email, password) => {
+  const res = await api.post('/api/auth/complete-registration', { email, password });
+  return res.data;
+};
+
+export const resendInitialOtp = async (email) => {
+  const res = await api.post('/api/auth/resend-initial-otp', { email });
   return res.data;
 };
 
