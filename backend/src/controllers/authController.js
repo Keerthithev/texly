@@ -13,7 +13,15 @@ export const signup = async (req, res) => {
     const otp = crypto.randomInt(100000, 999999).toString();
     const otpExpiry = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
     const user = await User.create({ name, email, password: hashed, isVerified: false, otp, otpExpiry });
-    await sendOTPEmail(email, otp);
+    
+    // Send OTP email (don't fail signup if email fails)
+    try {
+      await sendOTPEmail(email, otp);
+    } catch (emailErr) {
+      console.error('Failed to send OTP email:', emailErr.message);
+      // User is still created, they can verify email later
+    }
+    
     res.status(201).json({ message: 'User created successfully. Please check your email for verification OTP.' });
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -39,7 +47,11 @@ export const forgotPassword = async (req, res) => {
   try {
     const { email } = req.body;
     const user = await User.findOne({ email });
-    if (!user) return res.status(404).json({ message: 'User not found' });
+    
+    // Always return success to prevent email enumeration
+    if (!user) {
+      return res.json({ message: 'If an account exists with this email, an OTP has been sent.' });
+    }
 
     const otp = crypto.randomInt(100000, 999999).toString();
     const otpExpiry = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
@@ -48,7 +60,12 @@ export const forgotPassword = async (req, res) => {
     user.otpExpiry = otpExpiry;
     await user.save();
 
-    await sendOTPEmail(email, otp);
+    try {
+      await sendOTPEmail(email, otp);
+    } catch (emailErr) {
+      console.error('Failed to send OTP email:', emailErr.message);
+    }
+    
     res.json({ message: 'OTP sent to email' });
   } catch (err) {
     res.status(500).json({ message: err.message });
